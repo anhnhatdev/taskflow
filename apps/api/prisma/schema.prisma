@@ -216,6 +216,8 @@ model Task {
   creator         User          @relation("TaskCreator", fields: [createdBy], references: [id])
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  githubIssueId   String?
+  githubIssueNumber Int?
 
   assignees       TaskAssignee[]
   labels          TaskLabel[]

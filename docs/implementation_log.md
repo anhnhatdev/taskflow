@@ -12,15 +12,18 @@
     - Set up Zustand for state management.
     - Created Premium Landing Page.
     - **Implemented Auth UI:** Created Register and Login pages with glassmorphism and vibrant gradients.
-    - **Implemented Dashboard UI:** Created workspace selection view with empty state.
-    - **Reusable Components:** Built premium `Button` and `Input` components.
+    - **Implemented Dashboard UI:** Created workspace selection view with modal-based workspace creation.
+    - **Workspace Module:** Fully implemented backend & frontend for workspace management.
+    - **Project Module:** Implemented project creation and listing with sidebar navigation.
+    - **Kanban Board:** Created a premium Kanban board layout with status columns, automated task sequence numbering, and task creation.
+    - **Reusable Components:** Built premium `Button`, `Input`, and `Modal` components.
 4.  **Infrastructure:** (Completed)
 5.  **GitHub Integration:**
     - Initialized local git repository.
     - Created GitHub repository `anhnhatdev/taskflow`.
-    - Pushed initial setup and frontend updates to `main` branch.
+    - Pushed foundation, auth, and core feature updates to `main` branch.
 
 ### Next Task:
-- Implement Workspace Creation Modal/Page on frontend.
-- Implement Project Module (Backend & Frontend).
-- Start developing the core Kanban Board.
+- Implement GitHub App Webhook Integration.
+- Implement Time Tracking module.
+- Add real-time updates using WebSockets (Fastify Socket.io).

@@ -11,6 +11,8 @@ import { authRoutes } from './modules/auth/auth.routes.js';
 import { workspaceRoutes } from './modules/workspace/workspace.routes.js';
 import { projectRoutes } from './modules/project/project.routes.js';
 import { taskRoutes } from './modules/task/task.routes.js';
+import { githubRoutes } from './modules/github/github.routes.js';
+import { githubWorker } from './modules/github/github.worker.js';
 
 dotenv.config({ path: '../../.env' });
 
@@ -74,6 +76,7 @@ async function bootstrap() {
       await api.register(workspaceRoutes, { prefix: '/workspaces' });
       await api.register(projectRoutes, { prefix: '/workspaces/:workspaceId/projects' });
       await api.register(taskRoutes, { prefix: '/projects/:projectId/tasks' });
+      await api.register(githubRoutes, { prefix: '/github' });
 
       api.get('/', async () => {
         return { message: 'Taskflow API v1' };
@@ -83,6 +86,11 @@ async function bootstrap() {
     const port = Number(process.env.PORT) || 3001;
     await fastify.listen({ port, host: '0.0.0.0' });
     
+    // Start BullMQ Workers
+    githubWorker.on('completed', (job) => {
+      console.log(`[Worker] Job ${job.id} completed`);
+    });
+
     console.log(`🚀 Server ready at http://localhost:${port}`);
   } catch (err) {
     fastify.log.error(err);
