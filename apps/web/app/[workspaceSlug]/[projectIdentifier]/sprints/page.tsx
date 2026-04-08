@@ -13,6 +13,7 @@ import {
   TrendingDown, LayoutGrid, Briefcase, Settings,
   Activity, Clock, CheckCircle2, AlertCircle
 } from 'lucide-react';
+import { BurndownChart } from '@/components/analytics/BurndownChart';
 
 interface Sprint {
   id: string;
@@ -23,6 +24,23 @@ interface Sprint {
   status: 'UPCOMING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   tasks: any[];
 }
+
+const mockBurndownData = [
+  { day: 'Day 1', remaining: 100, ideal: 100 },
+  { day: 'Day 2', remaining: 95, ideal: 92 },
+  { day: 'Day 3', remaining: 88, ideal: 85 },
+  { day: 'Day 4', remaining: 88, ideal: 77 },
+  { day: 'Day 5', remaining: 75, ideal: 69 },
+  { day: 'Day 6', remaining: 60, ideal: 62 },
+  { day: 'Day 7', remaining: 55, ideal: 54 },
+  { day: 'Day 8', remaining: 45, ideal: 46 },
+  { day: 'Day 9', remaining: 40, ideal: 38 },
+  { day: 'Day 10', remaining: 25, ideal: 31 },
+  { day: 'Day 11', remaining: 20, ideal: 23 },
+  { day: 'Day 12', remaining: 10, ideal: 15 },
+  { day: 'Day 13', remaining: 5, ideal: 8 },
+  { day: 'Day 14', remaining: 0, ideal: 0 },
+];
 
 export default function SprintsPage() {
   const params = useParams();
@@ -98,7 +116,7 @@ export default function SprintsPage() {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white flex">
-      {/* Sidebar - Reusing styles */}
+      {/* Sidebar */}
       <aside className="w-64 border-r border-white/10 flex flex-col shrink-0">
         <div className="p-6 border-b border-white/10">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -156,7 +174,7 @@ export default function SprintsPage() {
                             <span className="text-xs font-bold uppercase tracking-widest bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/30">
                                Active
                             </span>
-                            <span className="text-zinc-500 text-sm">{new Date(activeSprint.startDate!).toLocaleDateString()} - {new Date(activeSprint.endDate!).toLocaleDateString()}</span>
+                            <span className="text-zinc-500 text-sm">{activeSprint.startDate ? new Date(activeSprint.startDate).toLocaleDateString() : 'N/A'} - {activeSprint.endDate ? new Date(activeSprint.endDate).toLocaleDateString() : 'N/A'}</span>
                          </div>
                          <h3 className="text-2xl font-bold">{activeSprint.name}</h3>
                          <p className="text-zinc-400 max-w-lg">{activeSprint.goal || 'No goal set for this sprint.'}</p>
@@ -176,11 +194,12 @@ export default function SprintsPage() {
                          </div>
                       </div>
 
-                      <div className="w-full md:w-80 h-48 bg-white/5 rounded-2xl border border-white/10 p-6 flex items-center justify-center">
-                         <div className="text-center space-y-3">
-                            <Activity className="w-10 h-10 text-zinc-700 mx-auto" />
-                            <p className="text-xs text-zinc-500 leading-relaxed uppercase tracking-tighter font-bold">Burndown Chart<br/>Coming Soon</p>
+                      <div className="w-full md:w-80 h-48 bg-white/5 rounded-2xl border border-white/10 p-4">
+                         <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Burndown</span>
+                            <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">On Track</span>
                          </div>
+                         <BurndownChart data={mockBurndownData} />
                       </div>
                    </div>
                 </div>
