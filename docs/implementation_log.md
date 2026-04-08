@@ -4,29 +4,23 @@
 **Date:** 2026-04-08
 
 ### Steps Taken:
-1.  **Monorepo Initialization:**
-    - Set up `pnpm` workspaces.
-    - Configured `Turborepo` for project orchestration.
-    - Created basic directory structure: `apps/web`, `apps/api`, `packages/types`, `packages/utils`, `infrastructure`, `docs`.
-2.  **Backend Setup (`apps/api`):**
-    - Initialized Fastify server.
-    - Configured Prisma ORM with PostgreSQL.
-    - Implemented Auth Module (Register/Login with JWT).
-    - Implemented Workspace Module (CRUD).
-    - Set up Zod schemas for validation.
+1.  **Monorepo Initialization:** (Completed)
+2.  **Backend Setup (`apps/api`):** (Completed)
 3.  **Frontend Setup (`apps/web`):**
     - Initialized Next.js 14 App Router.
     - Configured Tailwind CSS with custom theme (Inter font, Dark mode tokens).
     - Set up Zustand for state management.
     - Created Premium Landing Page.
-4.  **Infrastructure:**
-    - Created `docker-compose.yml` for Postgres and Redis.
-    - Created `.env` template.
+    - **Implemented Auth UI:** Created Register and Login pages with glassmorphism and vibrant gradients.
+    - **Implemented Dashboard UI:** Created workspace selection view with empty state.
+    - **Reusable Components:** Built premium `Button` and `Input` components.
+4.  **Infrastructure:** (Completed)
 5.  **GitHub Integration:**
     - Initialized local git repository.
     - Created GitHub repository `anhnhatdev/taskflow`.
-    - Pushed initial setup to `main` branch.
+    - Pushed initial setup and frontend updates to `main` branch.
 
 ### Next Task:
-- Implement Auth UI (Register & Login pages) in `apps/web`.
-- Implement Workspace dashboard and creation flow.
+- Implement Workspace Creation Modal/Page on frontend.
+- Implement Project Module (Backend & Frontend).
+- Start developing the core Kanban Board.

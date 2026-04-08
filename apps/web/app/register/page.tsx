@@ -57,7 +57,7 @@ export default function RegisterPage() {
             label="Full Name"
             placeholder="John Doe"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             required
           />
 
@@ -66,7 +66,7 @@ export default function RegisterPage() {
             placeholder="name@company.com"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             required
           />
           
@@ -75,7 +75,7 @@ export default function RegisterPage() {
             placeholder="••••••••"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             required
           />
 

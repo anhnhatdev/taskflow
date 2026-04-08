@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function LoginPage() {
   const router = useRouter();
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const setAuth = useAuthStore((state: any) => state.setAuth);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -69,7 +69,7 @@ export default function LoginPage() {
           <div className="flex flex-col gap-1.5">
             <div className="flex justify-between">
               <label className="text-sm font-medium text-zinc-400">Password</label>
-              <Link href="/forgot-password" size="sm" className="text-sm text-blue-400 hover:text-blue-300">
+              <Link href="/forgot-password" title="Forgot password" className="text-sm text-blue-400 hover:text-blue-300">
                 Forgot password?
               </Link>
             </div>
