@@ -1,0 +1,412 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum SprintStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  CANCELLED
+}
+
+enum TaskPriority {
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+  NO_PRIORITY
+}
+
+enum DependencyType {
+  BLOCKS
+  BLOCKED_BY
+  RELATES_TO
+  DUPLICATES
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  MENTIONED
+  TASK_BLOCKED
+  DEADLINE_APPROACHING
+  PR_MERGED
+  PR_REVIEW_REQUESTED
+  COMMENT_ADDED
+}
+
+model User {
+  id              String           @id @default(uuid())
+  email           String           @unique
+  passwordHash    String?
+  name            String
+  avatarUrl       String?
+  githubId        String?          @unique
+  githubUsername  String?
+  timezone        String           @default("Asia/Ho_Chi_Minh")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  workspacesCreated Workspace[]
+  workspaces      WorkspaceMember[]
+  invitesSent     WorkspaceInvite[]
+  projectsCreated Project[]
+  tasksCreated    Task[]           @relation("TaskCreator")
+  tasksAssigned   TaskAssignee[]
+  dependenciesCreated TaskDependency[]
+  comments        Comment[]
+  activityLogs    ActivityLog[]
+  timeLogs        TimeLog[]
+  notifications   Notification[]
+  notifActions    Notification[]   @relation("NotifActor")
+  tokens          RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("refresh_tokens")
+}
+
+model Workspace {
+  id          String           @id @default(uuid())
+  name        String
+  slug        String           @unique
+  avatarUrl   String?
+  createdBy   String
+  creator     User             @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  members     WorkspaceMember[]
+  invites     WorkspaceInvite[]
+  projects    Project[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime      @default(now())
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+model WorkspaceInvite {
+  id          String        @id @default(uuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  email       String
+  role        WorkspaceRole @default(MEMBER)
+  tokenHash   String
+  invitedBy   String
+  inviter     User          @relation(fields: [invitedBy], references: [id])
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@map("workspace_invites")
+}
+
+model Project {
+  id              String    @id @default(uuid())
+  workspaceId     String
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  identifier      String    // "TF", "API", etc.
+  icon            String?
+  color           String?
+  isPrivate       Boolean   @default(false)
+  githubRepoOwner String?
+  githubRepoName  String?
+  githubInstallationId String?
+  createdBy       String
+  creator         User      @relation(fields: [createdBy], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  sprints         Sprint[]
+  tasks           Task[]
+  labels          Label[]
+  webhookEvents   GithubWebhookEvent[]
+
+  @@unique([workspaceId, identifier])
+  @@index([workspaceId])
+  @@map("projects")
+}
+
+model Sprint {
+  id          String       @id @default(uuid())
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  goal        String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      SprintStatus @default(UPCOMING)
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  tasks       Task[]
+
+  @@index([projectId])
+  @@map("sprints")
+}
+
+model Task {
+  id              String        @id @default(uuid())
+  projectId       String
+  project         Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sprintId        String?
+  sprint          Sprint?       @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+  parentTaskId    String?
+  parentTask      Task?         @relation("Subtasks", fields: [parentTaskId], references: [id], onDelete: SetNull)
+  subtasks        Task[]        @relation("Subtasks")
+  sequenceNumber  Int           // TF-001 -> 1
+  title           String
+  description     String?       // Markdown
+  status          TaskStatus    @default(BACKLOG)
+  priority        TaskPriority  @default(NO_PRIORITY)
+  estimateHours   Float?
+  dueDate         DateTime?
+  sortOrder       Float         @default(0)
+  createdBy       String
+  creator         User          @relation("TaskCreator", fields: [createdBy], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  assignees       TaskAssignee[]
+  labels          TaskLabel[]
+  dependenciesFrom TaskDependency[] @relation("DependencyFrom")
+  dependenciesTo   TaskDependency[] @relation("DependencyTo")
+  branches        GithubBranch[]
+  pullRequests    GithubPullRequest[]
+  commits         GithubCommit[]
+  comments        Comment[]
+  activityLogs    ActivityLog[]
+  timeLogs        TimeLog[]
+
+  @@unique([projectId, sequenceNumber])
+  @@index([projectId])
+  @@index([sprintId])
+  @@index([projectId, status])
+  @@map("tasks")
+}
+
+model TaskAssignee {
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedAt  DateTime @default(now())
+
+  @@id([taskId, userId])
+  @@map("task_assignees")
+}
+
+model Label {
+  id          String      @id @default(uuid())
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  color       String
+  tasks       TaskLabel[]
+
+  @@unique([projectId, name])
+  @@map("labels")
+}
+
+model TaskLabel {
+  taskId  String
+  task    Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  labelId String
+  label   Label  @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, labelId])
+  @@map("task_labels")
+}
+
+model TaskDependency {
+  id          String         @id @default(uuid())
+  fromTaskId  String
+  fromTask    Task           @relation("DependencyFrom", fields: [fromTaskId], references: [id], onDelete: Cascade)
+  toTaskId    String
+  toTask      Task           @relation("DependencyTo", fields: [toTaskId], references: [id], onDelete: Cascade)
+  type        DependencyType
+  createdBy   String
+  creator     User           @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime       @default(now())
+
+  @@unique([fromTaskId, toTaskId, type])
+  @@map("task_dependencies")
+}
+
+model GithubBranch {
+  id           String   @id @default(uuid())
+  taskId       String
+  task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  repoFullName String
+  branchName   String
+  createdAt    DateTime @default(now())
+
+  @@unique([taskId, repoFullName, branchName])
+  @@map("github_branches")
+}
+
+model GithubPullRequest {
+  id                  String    @id @default(uuid())
+  taskId              String
+  task                Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  repoFullName        String
+  prNumber            Int
+  prTitle             String?
+  prStatus            String?   // open, closed, merged
+  prUrl               String?
+  authorGithubUsername String?
+  mergedAt            DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@unique([taskId, repoFullName, prNumber])
+  @@map("github_pull_requests")
+}
+
+model GithubCommit {
+  id                  String    @id @default(uuid())
+  taskId              String
+  task                Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  repoFullName        String
+  sha                 String
+  shortSha            String
+  message             String?
+  authorGithubUsername String?
+  committedAt         DateTime?
+  createdAt           DateTime  @default(now())
+
+  @@unique([taskId, sha])
+  @@map("github_commits")
+}
+
+model GithubWebhookEvent {
+  id          String    @id @default(uuid())
+  deliveryId  String    @unique
+  eventType   String
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id])
+  status      String    @default("pending") // pending, processed, failed
+  errorMessage String?
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@map("github_webhook_events")
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  taskId    String
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  content   String    // Markdown
+  editedAt  DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([taskId])
+  @@map("comments")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // 'status_changed', 'assigned', etc.
+  fromValue Json?
+  toValue   Json?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model TimeLog {
+  id              String    @id @default(uuid())
+  taskId          String
+  task            Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  startedAt       DateTime
+  endedAt         DateTime?
+  durationMinutes Int?
+  note            String?
+  isManual        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+
+  @@index([taskId])
+  @@index([userId])
+  @@map("time_logs")
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  title       String
+  body        String?
+  entityType  String?          // 'task', 'comment', etc.
+  entityId    String?
+  actorId     String?
+  actor       User?            @relation("NotifActor", fields: [actorId], references: [id])
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
+}
