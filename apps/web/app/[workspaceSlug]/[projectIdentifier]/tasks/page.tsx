@@ -12,7 +12,7 @@ import {
   Search, Filter, Plus, MoreHorizontal, 
   MessageSquare, Paperclip, Calendar,
   LayoutGrid, List as ListIcon, Settings,
-  Briefcase, Users, ChevronRight, BarChart2
+  Briefcase, Users, ChevronRight, BarChart2, Activity
 } from 'lucide-react';
 import { Timer } from '@/components/ui/Timer';
 import { useSocket } from '@/hooks/useSocket';
@@ -305,9 +305,28 @@ export default function KanbanPage() {
              </select>
            </div>
            
-           <div className="flex justify-end gap-3 mt-4">
-              <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-              <Button type="submit" isLoading={isCreating}>Create Task</Button>
+           <div className="flex justify-between items-center mt-4">
+              <Button 
+                variant="ghost" 
+                type="button" 
+                className="text-purple-500 hover:bg-purple-500/10 border border-purple-500/20"
+                onClick={async () => {
+                   if (!newTaskTitle) return alert('Enter a title first!');
+                   try {
+                      // Note: We need a temporary task or just a generic suggestion endpoint
+                      // For now, let's just trigger a generic prompt
+                      alert('AI Analysis starting...');
+                   } catch (err) {
+                      console.error(err);
+                   }
+                }}
+              >
+                 <Activity className="w-3 h-3 mr-2" /> AI Magic
+              </Button>
+              <div className="flex gap-3">
+                 <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                 <Button type="submit" isLoading={isCreating}>Create Task</Button>
+              </div>
            </div>
         </form>
       </Modal>

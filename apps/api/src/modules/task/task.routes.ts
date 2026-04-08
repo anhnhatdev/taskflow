@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { createTaskSchema, updateTaskSchema, moveTaskSchema } from './task.schema.js';
 import { createTask, findTasksByProject, updateTask, moveTask, findTaskById } from './task.service.js';
+import { suggestTaskCategorization } from '../ai/ai.service.js';
 
 export async function taskRoutes(fastify: FastifyInstance) {
   fastify.post('/', {
@@ -94,6 +95,22 @@ export async function taskRoutes(fastify: FastifyInstance) {
     return {
       success: true,
       data: task,
+    };
+  });
+
+  fastify.post('/:id/ai-suggest', {
+    onRequest: [fastify.authenticate]
+  }, async (request, reply) => {
+    const { id } = request.params as any;
+    const task = await findTaskById(id);
+    
+    if (!task) return reply.code(404).send({ success: false, message: 'Task not found' });
+
+    const suggestions = await suggestTaskCategorization(task.title, task.description || '');
+    
+    return {
+      success: true,
+      data: suggestions
     };
   });
 }

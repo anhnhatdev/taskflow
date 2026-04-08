@@ -19,6 +19,7 @@
     - **GitHub Integration:** Built webhook infrastructure with BullMQ and Redis for background issue/PR syncing.
     - **Time Tracking:** Implemented real-time timer component on task cards with backend persistence.
     - **Real-time Engine:** Integrated Socket.io for instant Kanban board updates across clients.
+    - **Sprint Management:** Built full cycle management for Sprints (Upcoming, Active, Completed) with goal tracking.
     - **Reusable Components:** Built premium `Button`, `Input`, `Modal`, `Timer`, and `useSocket` hooks.
 4.  **Infrastructure:** (Completed)
 5.  **GitHub Integration:**
@@ -27,6 +28,6 @@
     - Pushed foundation, auth, and all core feature updates to `main` branch.
 
 ### Next Task:
-- Add Sprint management and Burndown charts.
 - Implement AI Task Auto-categorization using Google Gemini.
-- Implement Dashboard Analytics and Insights.
+- Implement Dashboard Analytics (Burndown Charts).
+- Implement Notifications system.
