@@ -18,14 +18,15 @@
     - **Kanban Board:** Created a premium Kanban board layout with status columns, automated task sequence numbering, and task creation.
     - **GitHub Integration:** Built webhook infrastructure with BullMQ and Redis for background issue/PR syncing.
     - **Time Tracking:** Implemented real-time timer component on task cards with backend persistence.
-    - **Reusable Components:** Built premium `Button`, `Input`, `Modal`, and `Timer` components.
+    - **Real-time Engine:** Integrated Socket.io for instant Kanban board updates across clients.
+    - **Reusable Components:** Built premium `Button`, `Input`, `Modal`, `Timer`, and `useSocket` hooks.
 4.  **Infrastructure:** (Completed)
 5.  **GitHub Integration:**
     - Initialized local git repository.
     - Created GitHub repository `anhnhatdev/taskflow`.
-    - Pushed foundation, auth, and core feature updates to `main` branch.
+    - Pushed foundation, auth, and all core feature updates to `main` branch.
 
 ### Next Task:
-- Implement Real-time updates with Socket.io.
 - Add Sprint management and Burndown charts.
 - Implement AI Task Auto-categorization using Google Gemini.
+- Implement Dashboard Analytics and Insights.

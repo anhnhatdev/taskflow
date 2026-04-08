@@ -21,6 +21,7 @@ enum SprintStatus {
   UPCOMING
   ACTIVE
   COMPLETED
+  CANCELLED
 }
 
 enum TaskStatus {
