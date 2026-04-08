@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Timer } from '@/components/ui/Timer';
 import { useSocket } from '@/hooks/useSocket';
+import { NotificationDropdown } from '@/components/notification/NotificationDropdown';
 
 type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE' | 'CANCELLED';
 
@@ -206,6 +207,7 @@ export default function KanbanPage() {
                   className="bg-white/5 border border-white/10 rounded-full pl-9 pr-4 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-white/20 w-48 transition-all focus:w-64"
                 />
              </div>
+             <NotificationDropdown />
              <Button variant="outline" size="sm" className="h-8">
                <Filter className="w-3.5 h-3.5 mr-2" /> Filter
              </Button>

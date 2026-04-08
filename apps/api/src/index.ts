@@ -16,6 +16,7 @@ import { githubRoutes } from './modules/github/github.routes.js';
 import { githubWorker } from './modules/github/github.worker.js';
 import { timeRoutes } from './modules/time/time.routes.js';
 import { sprintRoutes } from './modules/sprint/sprint.routes.js';
+import { notificationRoutes } from './modules/notification/notification.routes.js';
 
 dotenv.config({ path: '../../.env' });
 
@@ -88,6 +89,7 @@ async function bootstrap() {
       await api.register(projectRoutes, { prefix: '/workspaces/:workspaceId/projects' });
       await api.register(taskRoutes, { prefix: '/projects/:projectId/tasks' });
       await api.register(sprintRoutes, { prefix: '/projects/:projectId/sprints' });
+      await api.register(notificationRoutes, { prefix: '/notifications' });
       await api.register(githubRoutes, { prefix: '/github' });
       await api.register(timeRoutes, { prefix: '/time' });
 

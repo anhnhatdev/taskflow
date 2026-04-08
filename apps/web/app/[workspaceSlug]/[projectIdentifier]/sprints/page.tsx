@@ -14,6 +14,7 @@ import {
   Activity, Clock, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { BurndownChart } from '@/components/analytics/BurndownChart';
+import { NotificationDropdown } from '@/components/notification/NotificationDropdown';
 
 interface Sprint {
   id: string;
@@ -152,9 +153,12 @@ export default function SprintsPage() {
               </h1>
               <p className="text-zinc-500 mt-2">Plan and execute work cycles for your team.</p>
             </div>
-            <Button onClick={() => setIsModalOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" /> Create Sprint
-            </Button>
+            <div className="flex items-center gap-3">
+               <NotificationDropdown />
+               <Button onClick={() => setIsModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" /> Create Sprint
+               </Button>
+            </div>
           </div>
 
           {/* Active Sprint Section */}
