@@ -9,6 +9,7 @@ import pino from 'pino';
 // Modules
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { workspaceRoutes } from './modules/workspace/workspace.routes.js';
+import { projectRoutes } from './modules/project/project.routes.js';
 
 dotenv.config({ path: '../../.env' });
 
@@ -70,6 +71,7 @@ async function bootstrap() {
       // Register modules
       await api.register(authRoutes, { prefix: '/auth' });
       await api.register(workspaceRoutes, { prefix: '/workspaces' });
+      await api.register(projectRoutes, { prefix: '/workspaces/:workspaceId/projects' });
 
       api.get('/', async () => {
         return { message: 'Taskflow API v1' };

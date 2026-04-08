@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/Button';
 import api from '@/lib/api';
 import Link from 'next/link';
 
+import { Modal } from '@/components/ui/Modal';
+import { Input } from '@/components/ui/Input';
+
 interface Workspace {
   id: string;
   name: string;
@@ -19,6 +22,24 @@ export default function DashboardPage() {
   const { user, accessToken, logout } = useAuthStore();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Create workspace form state
+  const [newWsName, setNewWsName] = useState('');
+  const [newWsSlug, setNewWsSlug] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
+
+  const fetchWorkspaces = async () => {
+    try {
+      const response = await api.get('/workspaces');
+      setWorkspaces(response.data.data);
+    } catch (err) {
+      console.error('Failed to fetch workspaces', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!accessToken) {
@@ -26,19 +47,30 @@ export default function DashboardPage() {
       return;
     }
 
-    const fetchWorkspaces = async () => {
-      try {
-        const response = await api.get('/workspaces');
-        setWorkspaces(response.data.data);
-      } catch (err) {
-        console.error('Failed to fetch workspaces', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchWorkspaces();
   }, [accessToken, router]);
+
+  const handleCreateWorkspace = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsCreating(true);
+    setCreateError('');
+
+    try {
+      await api.post('/workspaces', {
+        name: newWsName,
+        slug: newWsSlug,
+      });
+      
+      setNewWsName('');
+      setNewWsSlug('');
+      setIsModalOpen(false);
+      fetchWorkspaces();
+    } catch (err: any) {
+      setCreateError(err.response?.data?.error?.message || 'Failed to create workspace');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -58,7 +90,7 @@ export default function DashboardPage() {
           </Link>
           
           <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end mr-2">
+            <div className="flex flex-col items-end mr-2 text-right">
               <span className="text-sm font-medium">{user?.name}</span>
               <span className="text-xs text-zinc-500">{user?.email}</span>
             </div>
@@ -72,10 +104,10 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Your Workspaces</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Your Workspaces</h1>
             <p className="text-zinc-400 mt-1 text-sm">Select a workspace to view your projects and tasks.</p>
           </div>
-          <Button>+ Create Workspace</Button>
+          <Button onClick={() => setIsModalOpen(true)}>+ Create Workspace</Button>
         </div>
 
         {workspaces.length === 0 ? (
@@ -89,7 +121,7 @@ export default function DashboardPage() {
             <p className="text-zinc-400 text-sm mb-8 max-w-xs text-center">
               Create your first workspace to start managing your projects with GitHub integration.
             </p>
-            <Button size="lg">Create your first workspace</Button>
+            <Button size="lg" onClick={() => setIsModalOpen(true)}>Create your first workspace</Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -100,7 +132,7 @@ export default function DashboardPage() {
                 className="group p-6 glass rounded-2xl border border-white/10 hover:border-white/20 transition-all hover:bg-white/[0.07]"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center font-bold text-xl uppercase">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center font-bold text-xl uppercase shadow-lg shadow-blue-500/10">
                     {ws.name.charAt(0)}
                   </div>
                   <div>
@@ -110,8 +142,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex justify-between items-center mt-8 pt-4 border-t border-white/5">
                   <span className="text-xs text-zinc-400">Owner</span>
-                  <div className="flex -space-x-2">
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 border border-black flex items-center justify-center text-[10px]">
+                  <div className="flex -space-x-1.5">
+                    <div className="w-6 h-6 rounded-full bg-zinc-800 border-2 border-[#09090b] flex items-center justify-center text-[10px] text-zinc-400">
                       +1
                     </div>
                   </div>
@@ -121,6 +153,51 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* Create Workspace Modal */}
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        title="Create Workspace"
+      >
+        <form onSubmit={handleCreateWorkspace} className="flex flex-col gap-6">
+          {createError && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-xs">
+              {createError}
+            </div>
+          )}
+          
+          <Input
+            label="Workspace Name"
+            placeholder="e.g. Acme Team"
+            value={newWsName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setNewWsName(e.target.value);
+              if (!newWsSlug) {
+                setNewWsSlug(e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''));
+              }
+            }}
+            required
+          />
+
+          <Input
+            label="Workspace Slug (URL)"
+            placeholder="e.g. acme-team"
+            value={newWsSlug}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewWsSlug(e.target.value)}
+            required
+          />
+
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" isLoading={isCreating}>
+              Create Workspace
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
