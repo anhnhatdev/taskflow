@@ -23,7 +23,8 @@
     - **AI Engine:** Integrated Google Gemini 1.5 Flash for automatic task priority and label suggestions.
     - **Dashboard Analytics:** Implemented premium Burndown Charts using Recharts for Sprint tracking.
     - **Notifications System:** Built real-time backend/frontend notification engine with interactive dropdown UI.
-    - **Reusable Components:** Built premium `Button`, `Input`, `Modal`, `Timer`, `useSocket`, `BurndownChart`, and `NotificationDropdown`.
+    - **File Uploads:** Integrated fastify-multipart and fastify-static for local task attachments.
+    - **Reusable Components:** Built premium `Button`, `Input`, `Modal`, `Timer`, `useSocket`, `BurndownChart`, `NotificationDropdown`, and `FileUpload`.
 4.  **Infrastructure:** (Completed)
 5.  **GitHub Integration:**
     - Initialized local git repository.
@@ -31,5 +32,5 @@
     - Pushed foundation, auth, and all core feature updates to `main` branch.
 
 ### Next Task:
-- Implement File Uploads (S3/Local).
-- Final Polish and Deployment Walkthrough.
+- Final Polish (Icons, Typo fixes, Animations).
+- Full Project Walkthrough and Documentation.
