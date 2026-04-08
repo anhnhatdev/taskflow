@@ -14,6 +14,7 @@ import {
   LayoutGrid, List as ListIcon, Settings,
   Briefcase, Users, ChevronRight, BarChart2
 } from 'lucide-react';
+import { Timer } from '@/components/ui/Timer';
 
 type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE' | 'CANCELLED';
 
@@ -225,12 +226,10 @@ export default function KanbanPage() {
                          </h4>
                          
                          <div className="flex items-center justify-between mt-auto">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
+                               <Timer taskId={task.id} />
                                <div className="flex items-center gap-1 text-[10px] text-zinc-500">
                                   <MessageSquare className="w-3 h-3" /> 2
-                               </div>
-                               <div className="flex items-center gap-1 text-[10px] text-zinc-500">
-                                  <Paperclip className="w-3 h-3" /> 1
                                </div>
                             </div>
                             <div className="w-6 h-6 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-[10px] text-zinc-400 overflow-hidden">

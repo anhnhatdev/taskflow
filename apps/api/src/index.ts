@@ -13,6 +13,7 @@ import { projectRoutes } from './modules/project/project.routes.js';
 import { taskRoutes } from './modules/task/task.routes.js';
 import { githubRoutes } from './modules/github/github.routes.js';
 import { githubWorker } from './modules/github/github.worker.js';
+import { timeRoutes } from './modules/time/time.routes.js';
 
 dotenv.config({ path: '../../.env' });
 
@@ -77,6 +78,7 @@ async function bootstrap() {
       await api.register(projectRoutes, { prefix: '/workspaces/:workspaceId/projects' });
       await api.register(taskRoutes, { prefix: '/projects/:projectId/tasks' });
       await api.register(githubRoutes, { prefix: '/github' });
+      await api.register(timeRoutes, { prefix: '/time' });
 
       api.get('/', async () => {
         return { message: 'Taskflow API v1' };
