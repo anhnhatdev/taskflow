@@ -1,0 +1,103 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import api from '@/lib/api';
+
+export default function RegisterPage() {
+  const router = useRouter();
+  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      await api.post('/auth/register', { name, email, password });
+      router.push('/login?registered=true');
+    } catch (err: any) {
+      setError(err.response?.data?.error?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-[#09090b] relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/20 blur-[120px] rounded-full" />
+
+      <div className="w-full max-w-md p-8 glass rounded-3xl z-10">
+        <div className="text-center mb-10">
+          <Link href="/" className="text-2xl font-bold tracking-tighter mb-2 inline-block">
+            TASKFLOW
+          </Link>
+          <h1 className="text-2xl font-semibold text-white">Create an account</h1>
+          <p className="text-zinc-400 text-sm mt-2">Join Taskflow and start shiping faster today</p>
+        </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleRegister} className="flex flex-col gap-6">
+          <Input
+            label="Full Name"
+            placeholder="John Doe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+
+          <Input
+            label="Email"
+            placeholder="name@company.com"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          
+          <Input
+            label="Password"
+            placeholder="••••••••"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <Button type="submit" size="lg" isLoading={isLoading} className="mt-2">
+            Create Account
+          </Button>
+
+          <Button variant="outline" type="button" className="flex items-center gap-2">
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            Sign up with GitHub
+          </Button>
+        </form>
+
+        <p className="mt-8 text-center text-sm text-zinc-500">
+          Already have an account?{' '}
+          <Link href="/login" className="text-white hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </main>
+  );
+}
