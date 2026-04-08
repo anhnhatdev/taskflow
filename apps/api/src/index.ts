@@ -10,6 +10,7 @@ import pino from 'pino';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { workspaceRoutes } from './modules/workspace/workspace.routes.js';
 import { projectRoutes } from './modules/project/project.routes.js';
+import { taskRoutes } from './modules/task/task.routes.js';
 
 dotenv.config({ path: '../../.env' });
 
@@ -23,7 +24,7 @@ const logger = pino({
 });
 
 const fastify = Fastify({
-  logger,
+  logger: logger as any,
 });
 
 export const prisma = new PrismaClient();
@@ -72,6 +73,7 @@ async function bootstrap() {
       await api.register(authRoutes, { prefix: '/auth' });
       await api.register(workspaceRoutes, { prefix: '/workspaces' });
       await api.register(projectRoutes, { prefix: '/workspaces/:workspaceId/projects' });
+      await api.register(taskRoutes, { prefix: '/projects/:projectId/tasks' });
 
       api.get('/', async () => {
         return { message: 'Taskflow API v1' };
