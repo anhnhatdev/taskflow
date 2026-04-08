@@ -44,6 +44,9 @@ importers:
       fastify:
         specifier: ^4.26.2
         version: 4.29.1
+      fastify-socket.io:
+        specifier: ^5.1.0
+        version: 5.1.0(fastify@4.29.1)(socket.io@4.8.3)
       ioredis:
         specifier: ^5.10.1
         version: 5.10.1
@@ -109,7 +112,7 @@ importers:
         specifier: ^18
         version: 18.3.1(react@18.3.1)
       socket.io-client:
-        specifier: ^4.7.5
+        specifier: ^4.8.3
         version: 4.8.3
       tailwind-merge:
         specifier: ^2.2.2
@@ -2744,6 +2747,19 @@ packages:
 
   /fastify-plugin@4.5.1:
     resolution: {integrity: sha512-stRHYGeuqpEZTL1Ef0Ovr2ltazUT9g844X5z/zEBFLG8RYlpDiOCIG+ATvYEp+/zmc7sN29mcIMp8gvYplYPIQ==}
+    dev: false
+
+  /fastify-socket.io@5.1.0(fastify@4.29.1)(socket.io@4.8.3):
+    resolution: {integrity: sha512-GC1gjrxBGeTbMWV779XHF4uw3AtgKwSQJ9MnjGiMp91ZBuPXEdBYa7NnAMDEl3oZPgK9JO4BlNncTV+UAN+1kg==}
+    requiresBuild: true
+    peerDependencies:
+      fastify: 4.x.x
+      socket.io: '>=4'
+    dependencies:
+      fastify: 4.29.1
+      fastify-plugin: 4.5.1
+      socket.io: 4.8.3
+      tslib: 2.8.1
     dev: false
 
   /fastify@4.29.1:

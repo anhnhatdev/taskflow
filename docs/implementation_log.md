@@ -16,7 +16,9 @@
     - **Workspace Module:** Fully implemented backend & frontend for workspace management.
     - **Project Module:** Implemented project creation and listing with sidebar navigation.
     - **Kanban Board:** Created a premium Kanban board layout with status columns, automated task sequence numbering, and task creation.
-    - **Reusable Components:** Built premium `Button`, `Input`, and `Modal` components.
+    - **GitHub Integration:** Built webhook infrastructure with BullMQ and Redis for background issue/PR syncing.
+    - **Time Tracking:** Implemented real-time timer component on task cards with backend persistence.
+    - **Reusable Components:** Built premium `Button`, `Input`, `Modal`, and `Timer` components.
 4.  **Infrastructure:** (Completed)
 5.  **GitHub Integration:**
     - Initialized local git repository.
@@ -24,6 +26,6 @@
     - Pushed foundation, auth, and core feature updates to `main` branch.
 
 ### Next Task:
-- Implement GitHub App Webhook Integration.
-- Implement Time Tracking module.
-- Add real-time updates using WebSockets (Fastify Socket.io).
+- Implement Real-time updates with Socket.io.
+- Add Sprint management and Burndown charts.
+- Implement AI Task Auto-categorization using Google Gemini.

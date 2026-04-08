@@ -17,6 +17,8 @@ export async function taskRoutes(fastify: FastifyInstance) {
     const body = request.body as any;
 
     const task = await createTask(projectId, body, user.id);
+    fastify.io.to(`project:${projectId}`).emit('task:created', task);
+
     return {
       success: true,
       data: task,
@@ -87,6 +89,8 @@ export async function taskRoutes(fastify: FastifyInstance) {
     const body = request.body as any;
 
     const task = await moveTask(id, body);
+    fastify.io.to(`project:${task.projectId}`).emit('task:moved', task);
+
     return {
       success: true,
       data: task,

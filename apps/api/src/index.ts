@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import cookie from '@fastify/cookie';
+import socketio from 'fastify-socket.io';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import pino from 'pino';
@@ -35,6 +36,7 @@ export const prisma = new PrismaClient();
 declare module 'fastify' {
   interface FastifyInstance {
     authenticate: any;
+    io: any;
   }
 }
 
@@ -54,6 +56,13 @@ async function bootstrap() {
         cookieName: 'refreshToken',
         signed: false,
       },
+    });
+
+    await fastify.register(socketio, {
+      cors: {
+        origin: true,
+        credentials: true,
+      }
     });
 
     // Decorators
@@ -91,6 +100,18 @@ async function bootstrap() {
     // Start BullMQ Workers
     githubWorker.on('completed', (job) => {
       console.log(`[Worker] Job ${job.id} completed`);
+    });
+
+    fastify.ready((err) => {
+      if (err) throw err;
+      fastify.io.on('connection', (socket: any) => {
+        console.log(`[Socket] Client connected: ${socket.id}`);
+        
+        socket.on('join-project', (projectId: string) => {
+          socket.join(`project:${projectId}`);
+          console.log(`[Socket] Client ${socket.id} joined project:${projectId}`);
+        });
+      });
     });
 
     console.log(`🚀 Server ready at http://localhost:${port}`);

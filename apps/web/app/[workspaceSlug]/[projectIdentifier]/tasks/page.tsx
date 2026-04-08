@@ -15,6 +15,7 @@ import {
   Briefcase, Users, ChevronRight, BarChart2
 } from 'lucide-react';
 import { Timer } from '@/components/ui/Timer';
+import { useSocket } from '@/hooks/useSocket';
 
 type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE' | 'CANCELLED';
 
@@ -57,6 +58,31 @@ export default function KanbanPage() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>('TODO');
   const [isCreating, setIsCreating] = useState(false);
+  
+  // Initialize Socket
+  const socket = useSocket(project?.id);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('task:created', (newTask: Task) => {
+      setTasks((prev) => {
+        if (prev.find(t => t.id === newTask.id)) return prev;
+        return [...prev, newTask];
+      });
+    });
+
+    socket.on('task:moved', (updatedTask: Task) => {
+      setTasks((prev) => 
+        prev.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+      );
+    });
+
+    return () => {
+      socket.off('task:created');
+      socket.off('task:moved');
+    };
+  }, [socket]);
 
   const fetchData = async () => {
     try {
