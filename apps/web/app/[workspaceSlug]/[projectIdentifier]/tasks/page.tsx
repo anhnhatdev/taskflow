@@ -17,6 +17,7 @@ import {
 import { Timer } from '@/components/ui/Timer';
 import { useSocket } from '@/hooks/useSocket';
 import { NotificationDropdown } from '@/components/notification/NotificationDropdown';
+import { FileUpload } from '@/components/ui/FileUpload';
 
 type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE' | 'CANCELLED';
 
@@ -29,6 +30,8 @@ interface Task {
   project: {
     identifier: string;
   };
+  comments?: any[];
+  attachments?: any[];
 }
 
 interface Project {
@@ -249,7 +252,7 @@ export default function KanbanPage() {
                                FEATURE
                             </div>
                          </div>
-                         <h4 className="text-sm font-medium mb-4 line-clamp-2group-hover:text-blue-400 transition-colors">
+                         <h4 className="text-sm font-medium mb-4 line-clamp-2 group-hover:text-blue-400 transition-colors">
                             {task.title}
                          </h4>
                          
@@ -257,7 +260,11 @@ export default function KanbanPage() {
                             <div className="flex items-center gap-3">
                                <Timer taskId={task.id} />
                                <div className="flex items-center gap-1 text-[10px] text-zinc-500">
-                                  <MessageSquare className="w-3 h-3" /> 2
+                                  <MessageSquare className="w-3 h-3" /> {task.comments?.length || 0}
+                               </div>
+                               <div className="flex items-center gap-1 text-[10px] text-zinc-500">
+                                  <FileUpload taskId={task.id} onUploadSuccess={() => fetchData()} />
+                                  {task.attachments?.length || 0}
                                </div>
                             </div>
                             <div className="w-6 h-6 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-[10px] text-zinc-400 overflow-hidden">

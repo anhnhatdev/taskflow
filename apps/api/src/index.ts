@@ -17,6 +17,13 @@ import { githubWorker } from './modules/github/github.worker.js';
 import { timeRoutes } from './modules/time/time.routes.js';
 import { sprintRoutes } from './modules/sprint/sprint.routes.js';
 import { notificationRoutes } from './modules/notification/notification.routes.js';
+import multipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: '../../.env' });
 
@@ -51,6 +58,16 @@ async function bootstrap() {
     });
 
     await fastify.register(cookie);
+    await fastify.register(multipart, {
+      limits: {
+        fileSize: 50 * 1024 * 1024 // 50MB
+      }
+    });
+
+    await fastify.register(fastifyStatic, {
+      root: path.join(__dirname, '../uploads'),
+      prefix: '/uploads/',
+    });
 
     await fastify.register(jwt, {
       secret: process.env.JWT_SECRET || 'super-secret',

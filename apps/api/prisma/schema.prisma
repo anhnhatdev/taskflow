@@ -82,6 +82,7 @@ model User {
   timeLogs        TimeLog[]
   notifications   Notification[]
   notifActions    Notification[]   @relation("NotifActor")
+  attachments     Attachment[]
   tokens          RefreshToken[]
 
   @@map("users")
@@ -228,6 +229,7 @@ model Task {
   pullRequests    GithubPullRequest[]
   commits         GithubCommit[]
   comments        Comment[]
+  attachments     Attachment[]
   activityLogs    ActivityLog[]
   timeLogs        TimeLog[]
 
@@ -247,6 +249,21 @@ model TaskAssignee {
 
   @@id([taskId, userId])
   @@map("task_assignees")
+}
+
+model Attachment {
+  id          String   @id @default(uuid())
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename    String
+  fileUrl     String
+  fileSize    Int
+  mimeType    String
+  createdAt   DateTime @default(now())
+
+  @@map("attachments")
 }
 
 model Label {

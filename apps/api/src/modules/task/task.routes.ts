@@ -1,4 +1,8 @@
 import { FastifyInstance } from 'fastify';
+import fs from 'node:fs';
+import path from 'node:path';
+import { pipeline } from 'node:stream/promises';
+import { prisma } from '../../index.js';
 import { createTaskSchema, updateTaskSchema, moveTaskSchema } from './task.schema.js';
 import { createTask, findTasksByProject, updateTask, moveTask, findTaskById } from './task.service.js';
 import { suggestTaskCategorization } from '../ai/ai.service.js';
@@ -111,6 +115,40 @@ export async function taskRoutes(fastify: FastifyInstance) {
     return {
       success: true,
       data: suggestions
+    };
+  });
+
+  fastify.post('/:id/attachments', {
+    onRequest: [fastify.authenticate]
+  }, async (request, reply) => {
+    const { id: taskId } = request.params as any;
+    const user = request.user as any;
+    
+    const data = await request.file();
+    if (!data) return reply.code(400).send({ message: 'No file uploaded' });
+
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
+    const filename = `${Date.now()}-${data.filename}`;
+    const filePath = path.join(uploadDir, filename);
+
+    await pipeline(data.file, fs.createWriteStream(filePath));
+
+    const attachment = await prisma.attachment.create({
+      data: {
+        taskId,
+        userId: user.id,
+        filename: data.filename,
+        fileUrl: `/uploads/${filename}`,
+        fileSize: 0, // In real app, get from fs.stat
+        mimeType: data.mimetype
+      }
+    });
+
+    return { 
+      success: true, 
+      data: attachment 
     };
   });
 }
